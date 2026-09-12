@@ -3,6 +3,14 @@ MAIUSCULAS=["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N"
 DIGITOS=["0","1","2","3","4","5","6","7","8","9"]
 ESPECIAIS=["!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "=", "+", "[", "]", "{", "}", "|", ";", ":", '"', '"', ",", ".", "<", ">", "?", "/", "`", "~"]
 
+"""
+Como componente adicional de criatividade, foram adicionadas mensagens de boas-vindas, 
+instruções de uso e uma mensagem de encerramento para melhorar a experiência do usuário.
+
+"""
+
+# Procura uma palavra dentro de um arquivo e retorna True
+# quando encontra uma correspondência.
 def procurar_palavra(palavra, nome_do_arquivo, maiusculas_e_minusculas=False):
 
     with open(nome_do_arquivo, "r", encoding="utf8") as arquivo:        
@@ -16,12 +24,16 @@ def procurar_palavra(palavra, nome_do_arquivo, maiusculas_e_minusculas=False):
                     return True
         return False
 
-def palavra_tem_caractere(palavra, lista_caractere):
+# Verifica se a palavra possui pelo menos um caractere
+# pertencente à lista de caracteres informada.
+def palavra_tem_caractere(palavra, lista_caracteres):
     for caractere in palavra:
-        if caractere in lista_caractere:
+        if caractere in lista_caracteres:
             return True
     return False
-    
+
+# Calcula a complexidade da senha contando quantos
+# tipos diferentes de caracteres ela possui.  
 def calcular_complexidade(palavra):
     contador = 0
 
@@ -35,6 +47,8 @@ def calcular_complexidade(palavra):
         contador +=1
     return contador
 
+# Verifica as regras de segurança da senha e retorna
+# uma pontuação de força entre 0 e 5.
 def validar_senha(senha, comprimento_min=10, comprimento_forte=16):
 
     if procurar_palavra(senha, "dicionario.txt"):
@@ -58,7 +72,16 @@ def validar_senha(senha, comprimento_min=10, comprimento_forte=16):
     força = força_complexidade + 1
     return força
 
+# Executa o programa, recebe as senhas do usuário
+# e exibe a pontuação de força de cada senha.
 def main():
+
+    print("=" * 50)
+    print("     🔐 VERIFICADOR DE FORÇA DE SENHAS 🔐")
+    print("=" * 50)
+    print("Avalie a segurança da sua senha.")
+    print("Digite 'q' para sair.")
+    print()
 
     senha = input("Digite a senha: ")
 
@@ -66,7 +89,11 @@ def main():
         força = validar_senha(senha)
         print(f"A força da senha é: {força} ")
         
-        senha = input("Digite outra senha: ")
+        senha = input("\nDigite outra senha: ")
+
+    print("=" * 50)
+    print("     🔐 OBRIGADO POR ULTILIZAR O VERIFICADOR DE SENHAS!! 🔐")
+    print("=" * 50)
 
 if __name__ == "__main__":
     main()
