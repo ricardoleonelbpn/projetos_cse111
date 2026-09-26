@@ -1,6 +1,7 @@
 # Direitos Autorais 2020, Brigham Young University-Idaho. Todos os direitos reservados.
 
-from quimica import criar_tabela_periodica
+from quimica import criar_tabela_periodica, calcular_massa_molar
+from formula import interpretar_formula, FormulaError
 from pytest import approx
 import pytest
 
@@ -12,18 +13,20 @@ MASSA_ATOMICA_INDICE = 1
 
 
 def test_criar_tabela_periodica():
-    """Verifique se a função criar_tabela_periodica funciona corretamente.
+    """Verifica se a função criar_tabela_periodica funciona corretamente.
+
     Parâmetros: nenhum
     Retorno: nenhum
     """
-    # Chame a função criar_tabela_periodica e armazene o dicionário
-    # retornado em uma variável chamada dic_da_tabela_periodica .
+
+    # Chame a função criar_tabela_periodica e armazene o
+    # dicionário retornado em uma variável chamada dic_da_tabela_periodica.
     dic_da_tabela_periodica = criar_tabela_periodica()
 
     # Verifique se a função criar_tabela_periodica retorna um dicionário.
     assert isinstance(dic_da_tabela_periodica, dict), \
         "A função criar_tabela_periodica deve retornar um dicionário: " \
-        f" era esperado um dicionário, mas foi encontrado um {type(dic_da_tabela_periodica)}"
+        f"era esperado um dicionário, mas foi encontrado um {type(dic_da_tabela_periodica)}"
 
     # Verifique cada item no dicionário da tabela periódica.
     verificar_elemento(dic_da_tabela_periodica, "Ac", ["Actínio", 227])
@@ -123,35 +126,127 @@ def test_criar_tabela_periodica():
 
 
 def verificar_elemento(dic_da_tabela_periodica, simbolo, esperado):
-    """Verifique se o elemento real que veio do
-    dic_da_tabela_periodica contém os mesmos valores que o
-    elemento esperado.
+    """Verifica se o elemento atual vindo do
+    dic_da_tabela_periodica contém os mesmos valores
+    do elemento esperado.
 
     Parâmetros
-        simbolo: um símbolo de um elemento químico
-        esperado: uma lista que contém os valores esperados para o símbolo
+        simbolo: símbolo de um elemento químico
+        esperado: lista contendo os valores esperados
     Retorno: nenhum
     """
+
     # Verifique se o símbolo está no dicionário da tabela periódica.
     assert simbolo in dic_da_tabela_periodica, \
         f'"{simbolo}" está ausente do dicionário da tabela periódica.'
+
     atual = dic_da_tabela_periodica[simbolo]
 
     # Verifique se o nome do elemento está correto.
     nome_atual = atual[NOME_INDICE]
     nome_esperado = esperado[NOME_INDICE]
+
     assert nome_atual == nome_esperado, \
-            f'nome incorreto para "{simbolo}": ' \
-            f'esperado {nome_esperado}, mas encontrado {nome_atual}'
+        f'nome incorreto para "{simbolo}": ' \
+        f'esperado {nome_esperado}, mas encontrado {nome_atual}'
 
     # Verifique se a massa atômica do elemento está correta.
     massa_atual = atual[MASSA_ATOMICA_INDICE]
     massa_esperada = esperado[MASSA_ATOMICA_INDICE]
+
     assert massa_atual == approx(massa_esperada), \
-            f"massa atômica incorreta para {nome_esperado}: " \
-            f"esperado {massa_esperada} mas encontrado {massa_atual}"
+        f"massa atômica incorreta para {nome_esperado}: " \
+        f"esperado {massa_esperada}, mas encontrado {massa_atual}"
 
 
-# Chame a função main que faz parte do pytest para que o
-# computador execute as funções de teste neste arquivo.
+def test_interpretar_formula():
+    """Verifica se a função interpretar_formula funciona corretamente.
+
+    Parâmetros: nenhum
+    Retorno: nenhum
+    """
+
+    # Chame a função criar_tabela_periodica
+    # e verifique se ela retorna um dicionário.
+    dic_da_tabela_periodica = criar_tabela_periodica()
+
+    assert isinstance(dic_da_tabela_periodica, dict), \
+        "A função criar_tabela_periodica deve retornar um dicionário: " \
+        f"era esperado um dicionário, mas foi encontrado um {type(dic_da_tabela_periodica)}"
+
+    # Chame a função interpretar_formula e
+    # verifique se ela retorna uma lista.
+    lista_quantidade_simbolos = interpretar_formula("H2O", dic_da_tabela_periodica)
+
+    assert isinstance(lista_quantidade_simbolos, list), \
+        "A função interpretar_formula deve retornar uma lista: " \
+        f"era esperada uma lista, mas foi encontrado um {type(lista_quantidade_simbolos)}"
+
+    # Verifique se os valores retornados estão corretos.
+    assert interpretar_formula("H2O", dic_da_tabela_periodica) == [("H", 2), ("O", 1)]
+    assert interpretar_formula("C6H6", dic_da_tabela_periodica) == [("C", 6), ("H", 6)]
+    assert interpretar_formula("(C2(NaCl)4H2)2C4Na", dic_da_tabela_periodica) \
+        == [("C", 8), ("Na", 9), ("Cl", 8), ("H", 4)]
+    assert interpretar_formula("Co", dic_da_tabela_periodica) == [("Co", 1)]
+
+    # Verifique se exceções são lançadas para fórmulas inválidas.
+    with pytest.raises(FormulaError):
+        interpretar_formula("L", dic_da_tabela_periodica)
+
+    with pytest.raises(FormulaError):
+        interpretar_formula("4H", dic_da_tabela_periodica)
+
+    with pytest.raises(FormulaError):
+        interpretar_formula("H2L4", dic_da_tabela_periodica)
+
+    with pytest.raises(FormulaError):
+        interpretar_formula("-H", dic_da_tabela_periodica)
+
+    with pytest.raises(FormulaError):
+        interpretar_formula("(H2O", dic_da_tabela_periodica)
+
+    with pytest.raises(FormulaError):
+        interpretar_formula("H2)O3", dic_da_tabela_periodica)
+
+
+def test_calcular_massa_molar():
+    """Verifica se a função calcular_massa_molar funciona corretamente.
+
+    Parâmetros: nenhum
+    Retorno: nenhum
+    """
+
+    # Chame a função criar_tabela_periodica
+    # e verifique se ela retorna um dicionário.
+    dic_da_tabela_periodica = criar_tabela_periodica()
+
+    assert isinstance(dic_da_tabela_periodica, dict), \
+        "A função criar_tabela_periodica deve retornar um dicionário: " \
+        f"era esperado um dicionário, mas foi encontrado um {type(dic_da_tabela_periodica)}"
+
+    # Chame a função calcular_massa_molar
+    # e verifique se ela retorna um número.
+    massa = calcular_massa_molar([["O", 2]], dic_da_tabela_periodica)
+
+    assert isinstance(massa, (int, float)), \
+        "A função calcular_massa_molar deve retornar um número: " \
+        f"era esperado um número, mas foi encontrado um {type(massa)}"
+
+    # Verifique se os valores retornados estão corretos.
+    assert calcular_massa_molar([], dic_da_tabela_periodica) == 0
+
+    assert calcular_massa_molar([["O", 2]], dic_da_tabela_periodica) \
+        == approx(31.9988)
+
+    assert calcular_massa_molar([["C", 6], ["H", 6]], dic_da_tabela_periodica) \
+        == approx(78.11184)
+
+    assert calcular_massa_molar(
+        [["C", 13], ["H", 16], ["N", 2], ["O", 2]],
+        dic_da_tabela_periodica
+    ) == approx(232.27834)
+
+
+# Chame a função main do pytest para que o
+# computador execute as funções de teste deste arquivo.
 pytest.main(["-v", "--tb=line", "-rN", __file__])

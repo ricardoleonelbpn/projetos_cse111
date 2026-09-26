@@ -1,12 +1,38 @@
+# Melhorias:
+# Foi adicionado um loop while, para que, caso o usario queira realizar mais um calculo, ele é perguntado 
+# no final do programa. E para a melhoria do programa, adicionei um bloco de resultado, pegandos as informações
+# de grande reelevancia para o usuário.
+
+from formula import interpretar_formula
+
 def main():
 
-   tabela = criar_tabela_periodica()
-   print(tabela)
+    continuar = "s"
+
+    while continuar == "s":
+
+        formula = input("\nInsira a fórmula molecular da amostra: ").upper()
+        massa_grama = float(input("Insira a massa em gramas da amostra: "))
+
+        tabela = criar_tabela_periodica()
+        lista_elemento = interpretar_formula(formula, tabela)
+        massa_molar = calcular_massa_molar(lista_elemento, tabela)
+
+        mols = massa_grama / massa_molar
+
+        print()
+        print("=" * 20 + "Resultado" + "=" * 20)
+        print(f"Fórmula: {formula}")
+        print(f"Massa grama: {massa_grama}")
+        print(f"Massa molar: {massa_molar} g/mol")
+        print(f"Quantidade de matéria: {mols:.5f} mols")
+        print("=" * 50)
+        continuar = input("\nDeseja calcular novamente? (s/n) ").lower()
 
 def criar_tabela_periodica():
 
     dic_da_tabela_periodica = {
-    #chave  #elemento   #massa atômica
+    #simbolo  #nome   #massa atômica
     "Ac":	["Actínio", 227],
     "Ag":   ["Prata", 107.8682],
     "Al":   ["Alumínio", 26.9815386],
@@ -105,5 +131,20 @@ def criar_tabela_periodica():
 
     return dic_da_tabela_periodica 
     
+def calcular_massa_molar(lista_quantidade_simbolos, dic_da_tabela_periodica):
+
+    massa_total = 0
+
+    for elemento in lista_quantidade_simbolos:
+       simbolo = elemento[0]
+       quantidade = elemento[1]
+
+       item = dic_da_tabela_periodica[simbolo]
+       nome = item[0]
+       massa = item[1]
+       massa_total += massa * quantidade 
+
+    return massa_total
+
 if __name__ == "__main__":
  main()
