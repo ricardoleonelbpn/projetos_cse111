@@ -1,6 +1,11 @@
 import csv
 from datetime import datetime
 
+# Funcionalidade adicional: ao final do recibo, o programa realiza
+# uma pesquisa de satisfação, permitindo que o cliente dê uma nota
+# de 1 a 5 e deixe uma sugestão para a loja.
+
+
 # Lê um arquivo CSV e cria um dicionário usando uma coluna como chave.
 def ler_dicionario(filename, indice_coluna_chave):
     
@@ -19,71 +24,100 @@ def ler_dicionario(filename, indice_coluna_chave):
     return dicionario
 
 def main():
-    try:
-        # Obtém a data e a hora atuais do computador.
-        data_hora_atual = datetime.now()
+        try:
+            # Obtém a data e a hora atuais do computador.
+            data_hora_atual = datetime.now()
 
-        # Define os índices das colunas dos arquivos CSV.
-        INDICE_CHAVE_PRODUTO = 0
-        INDICE_NOME_PRODUTO = 1
-        INDICE_QUANTIDADE = 1
-        INDICE_VALOR = 2
+            # Define os índices das colunas dos arquivos CSV.
+            INDICE_CHAVE_PRODUTO = 0
+            INDICE_NOME_PRODUTO = 1
+            INDICE_QUANTIDADE = 1
+            INDICE_VALOR = 2
 
-        total_itens = 0
-        total_compras = 0
+            total_itens = 0
+            total_compras = 0
 
-        # Lê o catálogo de produtos e cria um dicionário.
-        dic_produto = ler_dicionario("produtos.csv", 0)
-        print()
+            # Lê o catálogo de produtos e cria um dicionário.
+            dic_produto = ler_dicionario("produtos.csv", 0)
+            print()
 
-        with open("pedido.csv", "rt", encoding="utf-8") as pedido:
+            with open("pedido.csv", "rt", encoding="utf-8") as pedido:
+
+                
+                leitor = csv.reader(pedido)
+                next(leitor)
+
+                print(20*'-' + " Mercearia Dona Filó " + 20*'-')
+                print()
+                print(5*"-" + " Recibo " + 5*"-")
+
+                for linha in leitor:
+
+                    if len(linha) != 0:
+                        chave = linha[INDICE_CHAVE_PRODUTO]
+                        produto = dic_produto[chave]
+                        
+                        nome_produto = produto[INDICE_NOME_PRODUTO]
+                        quantidade = linha[INDICE_QUANTIDADE]
+                        valor_produto = produto[INDICE_VALOR]
+
+                    print(f"Produto: {nome_produto}.") 
+                    print(f"Qtd: {quantidade} unidade.")
+                    print(f"Valor: {valor_produto} unitário.")
+                    print()
+
+                    quantidade = int(quantidade)
+                    valor_produto = float(valor_produto)
+                    soma = quantidade * valor_produto
+                    total_itens = total_itens + quantidade
+                    total_compras = total_compras + soma
+
+            # Calcula o imposto de 6% sobre o subtotal.
+            imposto = total_compras * 0.06
+            valor_devido = total_compras + imposto
+
+            print(f"Total de itens: {total_itens}")
+            print(f"Subtotal: R$ {total_compras:.2f}")
+            print(f"Imposto: R$ {imposto:.2f}")
+            print(f"Total devido: R$ {valor_devido:.2f}")
+            print("Obrigado por visitar nossa loja!")
+            print(f"Volte sempre! {data_hora_atual:%Y-%m-%d %H:%M}\n")
 
             
-            leitor = csv.reader(pedido)
-            next(leitor)
-
-            print(20*'-' + " Mercearia Dona Filó " + 20*'-')
+            print(20*"-" + " Pesquisa de Satisfação " + 20*"-")
             print()
-            print(5*"-" + " Recibo " + 5*"-")
-
-            for linha in leitor:
-
-                if len(linha) != 0:
-                    chave = linha[INDICE_CHAVE_PRODUTO]
-                    produto = dic_produto[chave]
                     
-                    nome_produto = produto[INDICE_NOME_PRODUTO]
-                    quantidade = linha[INDICE_QUANTIDADE]
-                    valor_produto = produto[INDICE_VALOR]
+            
+                
+            while True:
+                        
+                nota = int(input("De 1 a 5, qual nota você daria para nosso atendimento? "))
+                
+                if nota >=1 and nota <= 5:
+                
+                    if nota == 5:
+                        print("Obrigado! Ficamos felizes que você teve uma ótima experiência.")
+                    elif nota == 4:
+                        print("Obrigado! Ficamos felizes que você teve uma boa experiência.")
+                    elif nota == 3:
+                        print("Agradecemos sua avaliação. Vamos trabalhar para melhorar e atingir nota 5.")
+                    elif nota == 2:
+                        print("Agradecemos sua avaliação. Vamos trabalhar para melhorar e atingir nota 5.")
+                    elif nota == 1:
+                        print("Agradecemos sua avaliação. Vamos trabalhar para melhorar e atingir nota 5.")
+    
+                    feedback =  input("\nGostaria de deixar seu feedback? ")
+                    print("Obrigado pelo seu feedback!\n")
+                    break
+                else:
+                    print("\nNota inválida. Digite uma nota de 1 a 5.")
 
-                print(f"Produto: {nome_produto}.") 
-                print(f"Qtd: {quantidade} unidade.")
-                print(f"Valor: {valor_produto} unitário.")
-                print()
-
-                quantidade = int(quantidade)
-                valor_produto = float(valor_produto)
-                soma = quantidade * valor_produto
-                total_itens = total_itens + quantidade
-                total_compras = total_compras + soma
-
-        # Calcula o imposto de 6% sobre o subtotal.
-        imposto = total_compras * 0.06
-        valor_devido = total_compras + imposto
-
-        print(f"Total de itens: {total_itens}")
-        print(f"Subtotal: R$ {total_compras:.2f}")
-        print(f"Imposto: R$ {imposto:.2f}")
-        print(f"Total devido: R$ {valor_devido:.2f}")
-        print("Obrigado por visita nossa loja!")
-        print(f"Volte sempre! {data_hora_atual:%Y-%m-%d %H:%M}\n")
-
-    except FileNotFoundError as erro_arquivo:
-        print(f"Arquivo não encontrado ou diretório: {erro_arquivo}")
-    except PermissionError as err_de_perm:
-        print(f"Acesso não autorizado: {err_de_perm}")
-    except KeyError as err_de_chave:
-        print(type(err_de_chave).__name__, err_de_chave)
-       
+        except FileNotFoundError as erro_arquivo:
+            print(f"Arquivo não encontrado ou diretório: {erro_arquivo}")
+        except PermissionError as err_de_perm:
+            print(f"Acesso não autorizado: {err_de_perm}")
+        except KeyError as err_de_chave:
+            print(type(err_de_chave).__name__, err_de_chave)
+    
 if __name__ == "__main__":
     main()
